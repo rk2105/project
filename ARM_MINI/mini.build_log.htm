@@ -1,0 +1,99 @@
+<html>
+<body>
+<pre>
+<h1>µVision Build Log</h1>
+<h2>Project:</h2>
+C:\Users\HOME PC\OneDrive\Desktop\mini\mini.uvproj
+Project File Date:  12/07/2024
+
+<h2>Output:</h2>
+Build target 'Target 1'
+compiling lcd.c...
+linking...
+.\mini.axf: Error: L6218E: Undefined symbol CharLCD (referred from rtc.o).
+.\mini.axf: Error: L6218E: Undefined symbol CmdLCD (referred from rtc.o).
+.\mini.axf: Error: L6218E: Undefined symbol StrLCD (referred from rtc.o).
+.\mini.axf: Error: L6218E: Undefined symbol U32LCD (referred from rtc.o).
+Not enough information to list image symbols.
+Finished: 1 information, 0 warning and 4 error messages.
+".\mini.axf" - 4 Error(s), 0 Warning(s).
+Target not created
+</pre>
+</body>
+</html>
+t not created
+ symbols.
+Finished: 1 information, 0 warning and 4 error messages.
+".\mini.axf" - 4 Error(s), 1 Warning(s).
+Target not created
+ined symbol U32LCD (referred from rtc.o).
+Not enough information to list image symbols.
+Finished: 1 information, 0 warning and 4 error messages.
+".\mini.axf" - 4 Error(s), 2 Warning(s).
+Target not created
+i.axf" - 6 Error(s), 0 Warning(s).
+Target not created
+=GetYear();
+main.c(43): error:  #20: identifier "CLEAR_LCD" is undefined
+                  CmdLCD(CLEAR_LCD);
+main.c: 1 warning, 8 errors
+".\mini.axf" - 8 Error(s), 1 Warning(s).
+Target not created
+   default:StrLCD("Thank you");
+main.c(42): warning:  #223-D: function "CmdLCD" declared implicitly
+                  CmdLCD(CLEAR_LCD);
+main.c(42): error:  #20: identifier "CLEAR_LCD" is undefined
+                  CmdLCD(CLEAR_LCD);
+main.c: 4 warnings, 8 errors
+".\mini.axf" - 8 Error(s), 4 Warning(s).
+Target not created
+ain.c(27): error:  #20: identifier "SEC" is undefined
+                                  case 3:SEC=GetSec();
+main.c(27): warning:  #223-D: function "GetSec" declared implicitly
+                                  case 3:SEC=GetSec();
+main.c(29): warning:  #223-D: function "GetWeek" declared implicitly
+                                  case 4:Set_Week(GetWeek());
+main.c(31): error:  #20: identifier "DOM" is undefined
+                                  case 5:DOM=GetDate();
+main.c(31): warning:  #223-D: function "GetDate" declared implicitly
+                                  case 5:DOM=GetDate();
+main.c(33): error:  #20: identifier "MONTH" is undefined
+                                  case 6:MONTH=GetMonth();
+main.c(33): warning:  #223-D: function "GetMonth" declared implicitly
+                                  case 6:MONTH=GetMonth();
+main.c(35): error:  #20: identifier "YEAR" is undefined
+                                  case 7:YEAR=GetYear();
+main.c(35): warning:  #223-D: function "GetYear" declared implicitly
+                                  case 7:YEAR=GetYear();
+main.c(37): warning:  #223-D: function "StrLCD" declared implicitly
+                                  default:StrLCD("Thank you");
+main.c(41): warning:  #223-D: function "CmdLCD" declared implicitly
+                  CmdLCD(CLEAR_LCD);
+main.c(41): error:  #20: identifier "CLEAR_LCD" is undefined
+                  CmdLCD(CLEAR_LCD);
+main.c: 17 warnings, 8 errors
+".\mini.axf" - 8 Error(s), 17 Warning(s).
+Target not created
+dif
+types.h(8): warning:  #1-D: last line of file ends without a newline
+  typedef double f64;
+delay.h(5): warning:  #1-D: last line of file ends without a newline
+  ~                         
+delay.h(5): error:  #169: expected a declaration
+  ~                         
+rtc.c(15): warning:  #12-D: parsing restarts here after previous syntax error
+  s8 week[][4] = {"SUN","MON","TUE","WED","THU","FRI","SAT"};
+rtc.c(67): error:  #20: identifier "week" is undefined
+          StrLCD(week[DOW]);
+rtc.c(102): warning:  #223-D: function "strLCD" declared implicitly
+          strLCD("HH");
+rtc.c(209): warning:  #1-D: last line of file ends without a newline
+  }
+rtc.c: 11 warnings, 2 errors
+".\mini.axf" - 14 Error(s), 24 Warning(s).
+Target not created
+-D: last line of file ends without a newline
+  }
+rtc.c: 11 warnings, 2 errors
+".\mini.axf" - 14 Error(s), 25 Warning(s).
+Target not created

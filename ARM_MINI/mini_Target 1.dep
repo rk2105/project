@@ -1,0 +1,33 @@
+Dependencies for Project 'mini', Target 'Target 1': (DO NOT MODIFY !)
+F (.\Startup.s)(0x532C14EA)(--cpu ARM7TDMI --pd "__EVAL SETA 1" -g --apcs=interwork -I C:\Keil\ARM\RV31\INC-I C:\Keil\ARM\CMSIS\Include-I C:\Keil\ARM\Inc\Philips--list .\startup.lst --xref -o .\startup.o --depend .\startup.d)
+F (.\delay.c)(0x6753C98B)(-c --cpu ARM7TDMI -D__EVAL -g -O0 --apcs=interwork -I C:\Keil\ARM\RV31\INC-I C:\Keil\ARM\CMSIS\Include-I C:\Keil\ARM\Inc\Philips-o .\delay.o --omf_browse .\delay.crf --depend .\delay.d)
+I (types.h)(0x6753D36C)
+F (.\kpm.c)(0x6753D947)(-c --cpu ARM7TDMI -D__EVAL -g -O0 --apcs=interwork -I C:\Keil\ARM\RV31\INC-I C:\Keil\ARM\CMSIS\Include-I C:\Keil\ARM\Inc\Philips-o .\kpm.o --omf_browse .\kpm.crf --depend .\kpm.d)
+I (C:\Keil\ARM\Inc\Philips\LPC214x.h)(0x532C1500)
+I (keypad_defines.h)(0x6753D343)
+I (defines.h)(0x6753D909)
+I (types.h)(0x6753D36C)
+F (.\lcd.c)(0x6753D959)(-c --cpu ARM7TDMI -D__EVAL -g -O0 --apcs=interwork -I C:\Keil\ARM\RV31\INC-I C:\Keil\ARM\CMSIS\Include-I C:\Keil\ARM\Inc\Philips-o .\lcd.o --omf_browse .\lcd.crf --depend .\lcd.d)
+I (C:\Keil\ARM\Inc\Philips\LPC21xx.h)(0x532C1500)
+I (types.h)(0x6753D36C)
+I (lcd_defines.h)(0x6753D367)
+I (defines.h)(0x6753D909)
+I (delay.h)(0x6753D346)
+I (lcd.h)(0x6753D8BA)
+F (.\rtc.c)(0x6753D7A8)(-c --cpu ARM7TDMI -D__EVAL -g -O0 --apcs=interwork -I C:\Keil\ARM\RV31\INC-I C:\Keil\ARM\CMSIS\Include-I C:\Keil\ARM\Inc\Philips-o .\rtc.o --omf_browse .\rtc.crf --depend .\rtc.d)
+I (C:\Keil\ARM\Inc\Philips\LPC214x.H)(0x532C1500)
+I (rtc.h)(0x6753D33A)
+I (types.h)(0x6753D36C)
+I (kpm.h)(0x6753D8A3)
+I (lcd.h)(0x6753D8BA)
+I (lcd_defines.h)(0x6753D367)
+I (delay.h)(0x6753D346)
+F (.\main.c)(0x6753D8CB)(-c --cpu ARM7TDMI -D__EVAL -g -O0 --apcs=interwork -I C:\Keil\ARM\RV31\INC-I C:\Keil\ARM\CMSIS\Include-I C:\Keil\ARM\Inc\Philips-o .\main.o --omf_browse .\main.crf --depend .\main.d)
+I (C:\Keil\ARM\Inc\Philips\LPC21xx.h)(0x532C1500)
+I (lcd_defines.h)(0x6753D367)
+I (keypad_defines.h)(0x6753D343)
+I (kpm.h)(0x6753D8A3)
+I (types.h)(0x6753D36C)
+I (rtc.h)(0x6753D33A)
+I (lcd.h)(0x6753D8BA)
+I (defines.h)(0x6753D909)

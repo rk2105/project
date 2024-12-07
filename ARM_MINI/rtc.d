@@ -1,0 +1,12 @@
+.\rtc.o: rtc.c
+.\rtc.o: C:\Keil\ARM\Inc\Philips\LPC214x.H
+.\rtc.o: rtc.h
+.\rtc.o: types.h
+.\rtc.o: kpm.h
+.\rtc.o: types.h
+.\rtc.o: types.h
+.\rtc.o: lcd.h
+.\rtc.o: types.h
+.\rtc.o: lcd_defines.h
+.\rtc.o: delay.h
+.\rtc.o: types.h

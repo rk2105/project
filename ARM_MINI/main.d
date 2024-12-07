@@ -1,0 +1,11 @@
+.\main.o: main.c
+.\main.o: C:\Keil\ARM\Inc\Philips\LPC21xx.h
+.\main.o: lcd_defines.h
+.\main.o: keypad_defines.h
+.\main.o: kpm.h
+.\main.o: types.h
+.\main.o: rtc.h
+.\main.o: types.h
+.\main.o: lcd.h
+.\main.o: types.h
+.\main.o: defines.h
