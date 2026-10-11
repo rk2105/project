@@ -1,0 +1,18 @@
+# CCS build output (keep sources and project files)
+Debug/
+Release/
+*.out
+*.hex
+*.map
+*.obj
+*.o
+*.d
+*.lst
+*.pp
+
+# Local CCS / editor
+.launches/
+*.tmp
+*.bak
+.DS_Store
+Thumbs.db

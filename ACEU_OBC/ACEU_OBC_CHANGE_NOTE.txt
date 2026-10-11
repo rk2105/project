@@ -1,0 +1,275 @@
+/*****************************************************************************
+ * NOTE    : ACEU_OBC project change list
+ * Project : ACEU_OBC  (TMS320F28384D, C28xx CPU1, Debug)
+ * Date    : 10 Oct 2026
+ * Purpose : Record what was changed in this project so later builds
+ *           and imports follow the same rules.
+ *****************************************************************************/
+
+/*****************************************************************************
+ * 1. CCS project type (build, not application code)
+ *    Old : Cortex-M / TMS470, compiler looked up as Arm (20.2.x / 22.6.1 [Arm]).
+ *    New : C2000 / TMS320F28384D / C28xx_CPU1 / ti-cgt-c2000_22.6.1.LTS.
+ *    Files: .ccsproject, .cproject (TMS470 / Arm Debug+Release configs removed).
+ *    Linker: 2838x_flash_lnk_cpu1.cmd only (CM linker cmd removed).
+ *    Do not install an Arm 22.6.1 compiler. Import must show [C2000] not [Arm].
+ *****************************************************************************/
+
+/*****************************************************************************
+ * 2. C2000Ware / SysConfig
+ *    Product retargeted to C2000Ware 5.00.00.00
+ *    Path : C:\ti\c2000\C2000Ware_5_00_00_00\.metadata\sdk.json
+ *    CAN_MSG_OBJ_NO_FLAGS dropped (not in 5.00).
+ *    Driver aliases kept for SysConfig 5 names:
+ *      I2C_initController / I2C_setTargetAddress / I2C_CONTROLLER_* 
+ *      GPIO_setControllerCore
+ *****************************************************************************/
+
+/*****************************************************************************
+ * 3. ICD followed now (ACEU POV only)
+ *    Follow : ACEU_ICD_V1_AMS.pdf
+ *    Old    : ACUE_Single_Channel_ICD.pdf
+ *             ($ 0xAA CMD LEN payload CRC16-CCITT #)  -- no longer parsed
+ *
+ *    New frame (all live messages):
+ *      STX EB90 | MSGID | MSGLEN | MSGTXT[n] | CHKSUM
+ *    CHKSUM Method1 = XOR of STX, MSGID, MSGLEN, MSGTXT (1 byte).
+ *    Method2 CRC16-MODBUS (0xA001) is coded but not placed on the wire.
+ *****************************************************************************/
+
+/*****************************************************************************
+ * 4. Command map (NEW ICD). Firmware / flash NOT updated.
+ *
+ *    GUI/FCU -> ACEU     ACEU -> GUI/FCU     Meaning
+ *    0x90  MSGLEN 12     0x9A  MSGLEN 74     Fin Deflection / status (real-time)
+ *    0xB0  MSGLEN 0      0x80  MSGLEN 102    Read Configuration (RAM)
+ *    0xB1  MSGLEN 102    0x81  MSGLEN 1      Write Configuration (RAM only)
+ *    0xB2  MSGLEN 0      0x82  body 8        Read Fin Positions
+ *    0x91  MSGLEN 0      0x61  body 8        Home All
+ *    0x93  body 12       0x63  MSGLEN 46     Functional Test stream
+ *    0xAA  MSGLEN 0      0xBB  MSGLEN 32     ADC Data Acquisition
+ *
+ *    Fin home count     = 0x800000 (3-byte, big-endian)
+ *    Fin do-not-move    = 0x000000
+ *    This board         = CHANNEL 1 ONLY (Fin1 / Motor1 / EPWM1).
+ *                         ICD wire still has Fin2-4 slots (GUI MSGLEN).
+ *                         RX ignores Fin2-4. TX pads them. No EPWM2 start.
+ *
+ *    NOT implemented (do not change):
+ *      NEW flash/firmware  0xA5 / 0xB5 / 0xC5
+ *      OLD flash/firmware  0xEC .. 0xF6
+ *****************************************************************************/
+
+/*****************************************************************************
+ * 5. Old ICD commands removed from dispatch
+ *    0x20, 0x21, 0x22, 0x23, 0x26
+ *    0xE0, 0xE1, 0xE2, 0xE3, 0xE4, 0xE5, 0xE6, 0xE7, 0xE8, 0xE9, 0xEA, 0xEB
+ *    0xF7, 0xF8
+ *    Old 0xE2 Health / DSP POST / FPGA POST packet is gone.
+ *    POST fail now sends 0x9A status (HEALTH_PACKET_Feedback -> 0x9A).
+ *****************************************************************************/
+
+/*****************************************************************************
+ * 6. Files touched for ICD / comments
+ *    main.c
+ *    Application\Header\SystemInit.h
+ *    Application\Source\SystemInit.c   (parser, TX, Digital_Data_Validation)
+ *    Application\Header\AdcProcess.h
+ *    Application\Source\AdcProcess.c   (comments only for 0x9A / 0xBB slots)
+ *    Motor_Control / PWM / ADC / I2C / Flash API include left in place.
+ *    Config write 0xB1 applies Kp/Kd/Ki in RAM only (no flash program).
+ *****************************************************************************/
+
+/*****************************************************************************
+ * 7. CCS import reminder
+ *    If Import asks for Arm compiler: .cproject still has TMS470 configs.
+ *    Delete project from workspace (keep files), then import
+ *    D:\code\TMS\ACEU_OBC again. Properties must show 22.6.1.LTS [C2000].
+ *****************************************************************************/
+
+/*****************************************************************************
+ * 8. Functions newly added (SystemInit.c / SystemInit.h)
+ *
+ *    Public (also declared in SystemInit.h):
+ *      CRC16_MODBUS()
+ *          NEW ICD Method2 checksum, poly 0xA001, init 0xFFFF.
+ *          Coded only; not placed on the wire (Method1 XOR is used).
+ *      IcdXorChecksum()
+ *          NEW ICD Method1: XOR of STX, MSGID, MSGLEN, MSGTXT.
+ *      IcdSendFrame()
+ *          Build EB90 | MSGID | MSGLEN | MSGTXT | XOR and send on SCI-A.
+ *      ACEU_CONFIG_WRITE()
+ *          Handle 0xB1: copy 102-byte cfg to RAM, apply Kp/Kd/Ki, reply 0x81.
+ *          Flash program is not done.
+ *      FIN_POS_READ_Feedback()
+ *          Handle 0xB2: send 0x82 (4 x 2-byte positions, Fin1 live).
+ *      ADC_ACQ_Feedback()
+ *          Handle 0xAA: send 0xBB (32-byte ADC snapshot).
+ *
+ *    File-static helpers (SystemInit.c only):
+ *      icd_put_u16le()          Pack little-endian uint16 into MSGTXT.
+ *      icd_put_u24be()          Pack big-endian 24-bit fin count (0x800000).
+ *      icd_get_u24be()          Read big-endian 24-bit fin count from 0x90.
+ *      icd_put_f32le()          Pack IEEE float LE (0x80 Kp/Kd/Ki).
+ *      icd_get_f32le()          Read IEEE float LE (0xB1 Kp/Kd/Ki).
+ *      icd_pos_from_feedback()  Map PID 0..1000 to home-offset 24-bit count.
+ *      icd_apply_fin1_count()   Apply 0x90 / 0x93 Fin1 count to Analog_Command1.
+ *
+ *    Existing names kept, body rewritten for NEW ICD (not new symbols):
+ *      SCIARxISR()              Parser is now EB90 MSGID MSGLEN MSGTXT XOR.
+ *      RSS_422_New_Data()       Copies finished EB90 frame.
+ *      Digital_Data_Validation() Dispatches 0x90/0xB0/0xB1/0xB2/0x91/0x93/0xAA.
+ *      ACEU_CONFIG_READ()       Now sends 0x80 (was 0xE0 / 0xDD).
+ *      HEALTH_PACKET_Feedback() Now sends 0x9A (was 0xE2 Health).
+ *      HOME_ALL_Feedback()      Now sends 0x61 (was 0xE3).
+ *      STEP_SINE_TRAPEZOIDAL_START_Feedback()  Now sends 0x63 (was 0x8D).
+ *      STEP_SINE_TRAPEZOIDAL_STOP_Feedback()   Coast/brake only (no stop MSGID).
+ *
+ *    Not newly added (unchanged role):
+ *      SystemInit, ADC_Init, PWM_Init, InitEPWM, Interrupt_Init, Timer0Init,
+ *      Power_ON_SelfTest, HALL_TEST, Voltage_checks, ALU_Test,
+ *      Motor_Control, I2c_temp, PrintString, CRC16_CCITT,
+ *      Checksum_Calculation, canISR, ControlISR, gpioInterruptHandler.
+ *****************************************************************************/
+
+/*****************************************************************************
+ * 9. Flowcharts (ACEU_OBC, NEW ICD, ACEU POV)
+ *
+ * 9.1 Boot and main loop
+ *
+ *                    +------------------+
+ *                    |      RESET       |
+ *                    +--------+---------+
+ *                             |
+ *                             v
+ *                    +------------------+
+ *                    |  SystemInit()    |
+ *                    | clocks, Board,   |
+ *                    | ADC, PWM, IRQs   |
+ *                    +--------+---------+
+ *                             |
+ *                    POST == Failure?
+ *                       /         \
+ *                     yes          no
+ *                      |            |
+ *                      v            v
+ *           +----------------+   +------------------+
+ *           | HEALTH=0x01    |   | GPIO LED = ON    |
+ *           | send 0x9A loop |   +--------+---------+
+ *           | (no 0xE2)      |            |
+ *           +----------------+            v
+ *                                +------------------+
+ *                                |     while(1)     |
+ *                                +--------+---------+
+ *                                         |
+ *                    +--------------------+--------------------+
+ *                    |                    |                    |
+ *                    v                    v                    v
+ *           RSS_422_New_Data()     ReadIntADC()      Digital_Data_Validation()
+ *           copy EB90 frame        rails / pos /     switch MSGID [2]
+ *                                         |                    |
+ *                                         |                    v
+ *                                         |           Motor_Control()
+ *                                         |           Mode0 analog / Mode1 ICD
+ *                                         |                    |
+ *                                         |                    v
+ *                                         |              I2c_temp()
+ *                                         |                    |
+ *                                         +--------------------+
+ *                                         |
+ *                                         v
+ *                                    back to while(1)
+ *
+ * 9.2 SCI-A RX parser  (SCIARxISR)
+ *
+ *    byte in
+ *       |
+ *       v
+ *    +----------+     no      +----------+
+ *    | 0xEB ?   |------------>| hunt EB  |
+ *    +----+-----+             +----------+
+ *         | yes
+ *         v
+ *    +----------+     no      +----------+
+ *    | 0x90 ?   |------------>| hunt EB  |
+ *    +----+-----+             +----------+
+ *         | yes
+ *         v
+ *    store MSGID, store MSGLEN
+ *         |
+ *         +-- MSGLEN==0 ----------------+
+ *         |                             |
+ *         | MSGLEN>200 --> drop, hunt EB|
+ *         |                             |
+ *         v                             v
+ *    collect MSGTXT[n]            wait CHKSUM
+ *         |                             |
+ *         +-----------------------------+
+ *                       |
+ *                       v
+ *              XOR(STX..MSGTXT) == CHKSUM ?
+ *                   /            \
+ *                 yes             no
+ *                  |               |
+ *                  v               v
+ *           Uart_NewData=1     drop frame
+ *           copy OBC_DATA_ACT  hunt EB
+ *
+ * 9.3 Command dispatch  (Digital_Data_Validation)
+ *
+ *              OBC_DATA_ACT[2] = MSGID
+ *                       |
+ *          +------------+------------+------------+
+ *          |            |            |            |
+ *          v            v            v            v
+ *       0x90         0xB0         0xB1         0xB2
+ *    Fin Deflect  Cfg Read     Cfg Write    Fin Pos Read
+ *    apply Fin1   0x80 102 B   RAM KpKdKi   0x82 8 B
+ *    Flag2: 0x9A  one-shot     0x81 status  one-shot
+ *          |            |            |            |
+ *          +------------+------------+------------+
+ *          |            |            |            |
+ *          v            v            v            v
+ *       0x91         0x93         0xAA      0xA5/B5/C5
+ *    Home All     Func Test    ADC Acq     firmware
+ *    home Fin1    Fin1 if bit0 0xBB 32 B   NOT UPDATED
+ *    0x61 8 B     Flag5: 0x63  one-shot    (no action)
+ *                       |
+ *                       v
+ *              default / unknown: ignore
+ *
+ * 9.4 Real-time Channel 1 path  (0x90 / 0x9A)
+ *
+ *    GUI/FCU --RS-422--> 0x90 (ICD still 4 x 3-byte slots)
+ *                       |
+ *                       v
+ *              take Fin1 only; ignore Fin2/3/4
+ *              icd_get_u24be Fin1
+ *                       |
+ *              count == 0x000000 ? --yes--> do not move Channel 1
+ *                       | no
+ *                       v
+ *              icd_apply_fin1_count
+ *              home = 0x800000, Mode = 1
+ *                       |
+ *                       v
+ *              Motor_Control() EPWM1 / Analog_Command1
+ *                       |
+ *              Flag2 (~2 ms) ?
+ *                       | yes
+ *                       v
+ *              HEALTH_PACKET_Feedback
+ *              IcdSendFrame 0x9A 74 B + XOR
+ *                       |
+ *                       v
+ *              GUI/FCU: Fin1 live, Fin2-4 pad
+ *
+ * 10. Channel 1 only (this ACEU)
+ *    Live hardware : Fin1, Motor1, EPWM1, POT1, Imot1.
+ *    Not driven    : Fin2-4, Motor2-4, EPWM2, Analog_Command2.
+ *    0x90          : apply Fin1 count only.
+ *    0x91          : home Fin1 only.
+ *    0x93          : bit 0 Fin1 only; bits 1-3 ignored.
+ *    0x9A / 0x82 / 0x61 / 0x63 / 0xBB : Channel 1 data; other slots pad.
+ *    MSGLEN not shortened (ACEU_ICD_V1_AMS GUI still uses 4-slot frames).
+ *****************************************************************************/
